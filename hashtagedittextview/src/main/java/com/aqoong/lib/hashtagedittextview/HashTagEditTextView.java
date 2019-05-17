@@ -101,6 +101,7 @@ public class HashTagEditTextView extends AppCompatEditText {
     private boolean isItemOverLength(){
         String[] tagArray = getInsertTag();
 
+
         if(tagArray[tagArray.length-1].trim().length() > mItemMaxLength){
             return true;
         }else{
