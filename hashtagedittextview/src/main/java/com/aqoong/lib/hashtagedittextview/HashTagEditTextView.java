@@ -58,7 +58,7 @@ public class HashTagEditTextView extends AppCompatEditText {
             this.append("#");
 
     }
-    private CharSequence tempChar="";
+
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
         Log.d(TAG, "=====onTextChanged====");
@@ -66,14 +66,12 @@ public class HashTagEditTextView extends AppCompatEditText {
         Log.d(TAG, "start : " + start);
         Log.d(TAG, "before : " + before);
         Log.d(TAG, "count : " + count);
+
         try {
             if (isItemOverLength()) {
                 Toast.makeText(getContext(), "태그의 길이가 깁니다", Toast.LENGTH_LONG).show();
                 onKeyDown(KeyEvent.KEYCODE_DEL, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
                 return;
-            } else {
-                tempChar = s;
-                currentKeyCode = 0;
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -82,15 +80,18 @@ public class HashTagEditTextView extends AppCompatEditText {
         try {
             String lastChar = s.toString().substring(s.length() - 1);
             //checked white space
-            if (lastChar.equals(" ") || lastChar.equals("\n") && currentKeyCode != KeyEvent.KEYCODE_DEL) {
-                if(mItemMaxCount < getInsertTag().length){
+            if ((lastChar.equals(" ") || lastChar.equals("\n")) && currentKeyCode != KeyEvent.KEYCODE_DEL) {
+                if(mItemMaxCount <= getInsertTag().length){
                     Toast.makeText(getContext(), "태그의 개수가 많습니다", Toast.LENGTH_LONG).show();
                     onKeyDown(KeyEvent.KEYCODE_DEL, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
                     return;
                 }
 
-                if(mAutoPoundSign)
+                if(mAutoPoundSign && getLastTag().length() > 1) {
                     this.append("#");
+                }else{
+                    return;
+                }
             }else{
                 currentKeyCode = 0;
             }
@@ -99,10 +100,7 @@ public class HashTagEditTextView extends AppCompatEditText {
     }
 
     private boolean isItemOverLength(){
-        String[] tagArray = getInsertTag();
-
-
-        if(tagArray[tagArray.length-1].trim().length() > mItemMaxLength){
+        if(getLastTag().length() > mItemMaxLength){
             return true;
         }else{
             return false;
@@ -110,19 +108,35 @@ public class HashTagEditTextView extends AppCompatEditText {
     }
 
     public String[] getInsertTag(){
-        String[] result = tempChar.toString().trim().split("#");
+        String[] temp = this.getText().toString().split("#");
+        String[] result = new String[temp.length-1];
+        for(int i = 0 ; i < result.length ; i++){
+            result[i] = temp[i + 1];
+        }
 
         return result;
+    }
+
+    public String getLastTag(){
+        String[] tagArray = getInsertTag();
+
+        return tagArray[tagArray.length-1].trim();
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         currentKeyCode = keyCode;
+        if(this.length() == 0){
+            this.append("#");
+        }
+
         if(keyCode == KeyEvent.KEYCODE_DEL
                 && this.length() <= 1)
         {
             return false;
         }
+
+
         return super.onKeyDown(keyCode, event);
     }
 }
