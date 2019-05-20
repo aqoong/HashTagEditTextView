@@ -109,12 +109,15 @@ public class HashTagEditTextView extends AppCompatEditText {
 
     public String[] getInsertTag(){
         String[] temp = this.getText().toString().split("#");
-        String[] result = new String[temp.length-1];
-        for(int i = 0 ; i < result.length ; i++){
-            result[i] = temp[i + 1];
+        if(temp.length > 0) {
+            String[] result = new String[temp.length - 1];
+            for (int i = 0; i < result.length; i++) {
+                result[i] = temp[i + 1].trim();
+            }
+            return result;
+        }else{
+            return null;
         }
-
-        return result;
     }
 
     public String getLastTag(){
