@@ -78,6 +78,8 @@ public class HashTagEditTextView extends AppCompatEditText {
         }
 
         try {
+            checkNumberChar(s);
+
             String lastChar = s.toString().substring(s.length() - 1);
             //checked white space
             if ((lastChar.equals(" ") || lastChar.equals("\n")) && currentKeyCode != KeyEvent.KEYCODE_DEL) {
@@ -92,9 +94,18 @@ public class HashTagEditTextView extends AppCompatEditText {
                 }else{
                     return;
                 }
-            }else{
+            }
+            else if(lastChar.equals("#") && currentKeyCode != KeyEvent.KEYCODE_DEL){
+                if(mItemMaxCount <= getInsertTag().length){
+                    Toast.makeText(getContext(), "태그의 개수가 많습니다", Toast.LENGTH_LONG).show();
+                    onKeyDown(KeyEvent.KEYCODE_DEL, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
+                    return;
+                }
+            }
+            else{
                 currentKeyCode = 0;
             }
+
         }catch (Exception e){
         }
     }
@@ -116,7 +127,7 @@ public class HashTagEditTextView extends AppCompatEditText {
             }
             return result;
         }else{
-            return null;
+            return temp;
         }
     }
 
@@ -141,5 +152,19 @@ public class HashTagEditTextView extends AppCompatEditText {
 
 
         return super.onKeyDown(keyCode, event);
+    }
+
+    private void checkNumberChar(CharSequence s){
+        int tempCount = 0;
+        for(int i = 0 ; i < s.length() ; i++){
+            if('#' == s.charAt(i)){
+                tempCount++;
+            }
+            if(tempCount > mItemMaxCount){
+                Toast.makeText(getContext(), "태그의 개수가 많습니다", Toast.LENGTH_LONG).show();
+                onKeyDown(KeyEvent.KEYCODE_DEL, new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
+                return;
+            }
+        }
     }
 }
